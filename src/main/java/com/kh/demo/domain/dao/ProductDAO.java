@@ -1,4 +1,4 @@
-package com.kh.demo.dao;
+package com.kh.demo.domain.dao;
 
 import java.util.List;
 import java.util.Optional;

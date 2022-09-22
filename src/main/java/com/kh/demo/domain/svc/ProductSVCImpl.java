@@ -1,7 +1,7 @@
-package com.kh.demo.svc;
+package com.kh.demo.domain.svc;
 
-import com.kh.demo.dao.Product;
-import com.kh.demo.dao.ProductDAO;
+import com.kh.demo.domain.dao.Product;
+import com.kh.demo.domain.dao.ProductDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

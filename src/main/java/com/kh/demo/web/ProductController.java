@@ -1,14 +1,15 @@
 package com.kh.demo.web;
 
-import com.kh.demo.dao.Product;
-import com.kh.demo.svc.ProductSVC;
+import com.kh.demo.domain.dao.Product;
+import com.kh.demo.domain.svc.ProductSVC;
+import com.kh.demo.web.api.ApiResponse;
+import com.kh.demo.web.api.form.AddForm;
 import com.kh.demo.web.form.DetailForm;
-import com.kh.demo.web.form.SaveForm;
 import com.kh.demo.web.form.UpdateForm;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -20,54 +21,26 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Controller
-@AllArgsConstructor
+@RestController
+@RequiredArgsConstructor
 @RequestMapping("/products")
 public class ProductController {
 
+  @Autowired
   private final ProductSVC productSVC;
-
-  //등록양식
-  @GetMapping("/add")
-  public String saveForm(Model model) {
-    model.addAttribute("form", new SaveForm());
-    return "product/saveForm";
-  }
 
   //등록
   @PostMapping("/add")
-  public String save(@Valid @ModelAttribute("form") SaveForm saveForm,
-                     BindingResult bindingResult,
-                     RedirectAttributes redirectAttributes) {
+  public ApiResponse<Object> add (
+          @Valid @RequestBody AddForm addForm,
+          BindingResult bindingResult
+  ) {
+      Product product = new Product();
+      BeanUtils.copyProperties(addForm, product);
 
-    //기본검증
-    if(bindingResult.hasErrors()){
-      log.info("bindingResult={}", bindingResult);
-      return "product/saveForm";
-    }
+      productSVC.save(product);
 
-    //필드검증
-    //상품수량은 100초과 금지
-    if(saveForm.getQuantity() > 100){
-      bindingResult.rejectValue("quantity","product.quantity",new Integer[]{100},"상품수량 초과");
-      log.info("bindingResult={}", bindingResult);
-      return "product/saveForm";
-    }
-
-    //오브젝트검증
-    //총액(상품수량*단가) 1000만원 초과금지
-    if(saveForm.getQuantity() * saveForm.getPrice() > 10_000_000L){
-      bindingResult.reject("product.totalPrice",new Integer[]{1000},"총액 초과!");
-      log.info("bindingResult={}", bindingResult);
-      return "product/saveForm";
-    }
-
-    Product product = new Product();
-    BeanUtils.copyProperties(saveForm, product);
-    Long productId = productSVC.save(product);
-
-    redirectAttributes.addAttribute("id", productId);
-    return "redirect:/products/{id}/detail";
+      return ApiResponse.createApiResMsg("00", "성공", null);
   }
 
   //조회
