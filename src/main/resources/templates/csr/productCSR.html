@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRODUCT CSR</title>
+    <style>
+        .fieldError {
+            color: red;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        #productList .allProducts .head,
+        #productList .allProducts .body {
+            display: grid;
+            grid-template-columns: .4fr .3fr .2fr .2fr;
+            grid-auto-rows: 30px;
+        }
+        #productList .allProducts .head {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        #productList .allProducts .head div,
+        #productList .allProducts .body div {
+            border: 1px solid gray;
+        }
+
+        /* 버튼 */
+        .none {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>상품관리 CSR</h2>
+    <hr>
+
+    <h3>상품</h3>
+    <form action="">
+        <div>
+            <input type="text" id="pid">
+            <label for="pid"><= 상품아이디</label>
+        </div>
+        <div>
+            <input type="text" id="pname">
+            <label for="pname"><= 상품명</label>
+        </div>
+        <div>
+            <input type="text" id="count">
+            <label for="count"><= 수량</label>
+        </div>
+        <div>
+            <input type="text" id="price">
+            <label for="price"><= 가격</label>
+        </div>
+        <div>
+            <button type="button" id="addBtn">등록하기</button>
+            <button type="button" id="findBtn">조회하기</button>
+            <button type="button" id="editBtn">수정하기</button>
+            <button type="button" id="delBtn">삭제하기</button>
+            <button type="button" id="clsBtn">클리어</button>
+        </div>
+    </form>
+    <hr>
+
+    <div id="productList">
+        <h3>전체상품 목록</h3>
+        <div class="allProducts">
+            <div class="head">
+                <div>상품아이디</div><div>상품명</div><div>수량</div><div>단가</div>
+            </div>
+            <div class="body">
+            </div>
+        </div>
+        <div>
+            <button id="listBtn">목록</button>
+        </div>
+    </div>
+
+
+    <script>
+        //클리어버튼 클릭해서 클리어
+        clsBtn.addEventListener('click', e => {
+            clearForm();
+        });
+
+        //등록시 입력데이터 불러오기
+        function getInputData() {
+            const pname = document.getElementById('pname').value;
+            const count = document.getElementById('count').value;
+            const price = document.getElementById('price').value;
+
+            return {pname, count, price};
+        };
+
+        //등록버튼 클릭해서 상품 등록
+        addBtn.addEventListener('click', e => {
+            const product = getInputData();
+            add(product);
+        });
+
+        //상품등록 함수
+        function add(product) {
+            const url = 'http://localhost:9080/api/products';
+
+            fetch (url, {method: 'POST',
+                         headers: {'Content-Type': 'application/json',
+                                   'Accept': 'application/json'},
+                         body: JSON.stringify(product)
+                         }).then(res => res.json())
+                           .then(data => console.log('data: ', data))
+                           .catch(err => console.log('err: ', err));
+        }
+
+        
+        //조회버튼 클릭해서 상품 조회
+        findBtn.addEventListener('click', e => {
+            const id = pid.value;
+            findById(id);
+        });
+
+        //상품조회 함수
+        function findById(id) {
+            const url = `http://localhost:9080/api/products/${id}`;
+
+            fetch (url, {method: 'GET',
+                         headers: {'Accept': 'application/json'}
+                        }).then(res => res.json())
+                          .then(res => {
+                            if(res.header.rtcd == '00') {
+                                const {pid, pname, count, price} = res.data;
+                                document.getElementById('pid').value = pid;
+                                document.getElementById('pname').value = pname;
+                                document.getElementById('count').value = count;
+                                document.getElementById('price').value = price;
+                            }
+                          })
+                          .catch(err => console.log('err: ', err));
+        }
+
+        //수정버튼 클릭해서 상품 수정
+        editBtn.addEventListener('click', e => {
+            edit(pid.value, getInputData());
+        });
+
+        //상품수정 함수
+        function edit(id, product) {
+            const url = `http://localhost:9080/api/products/${id}`;
+
+            fetch (url, {method: 'PATCH',
+                         headers: {'Content-Type': 'application/json',
+                                   'Accept': 'application/json'},
+                         body: JSON.stringify(product)
+                         }).then(res => res.json())
+                           .then(data => console.log('data: ', data))
+                           .catch(err => console.log('err: ', err));
+        }
+
+        //삭제버튼 클릭해서 상품 삭제
+        delBtn.addEventListener('click', e => {
+            if(!confirm('삭제하시겠습니까?')) return;
+            const id = pid.value;
+            deleteById(id);
+        });
+
+        //상품삭제 함수
+        function deleteById(id) {
+            const url = `http://localhost:9080/api/products/${id}`;
+
+            fetch (url, {method: 'DELETE',
+                         headers: {'Accept': 'application/json'}
+                        }).then(res => res.json())
+                          .then(data => console.log('data: ', data))
+                          .catch(err => console.log('err: ', err));
+        }
+
+        //목록버튼 클릭해서 전체상품목록 보기
+        listBtn.addEventListener('click', e => {
+            allProducts();
+        });
+
+        //전체상품목록 함수
+        function allProducts() {
+            const url = `http://localhost:9080/api/products`;
+
+            fetch (url, {method: 'GET',
+                         headers: {'Accept': 'application/json'}
+                        }).then(response => response.json())
+                          .then(response => {
+                                if(response.header.rtcd == '00') {
+                                const result =
+                                response.data.map(product => {
+                                    return `<div>${product.pid}</div>
+                                    <div><a href='#' onclick='findById(${product.pid})'>${product.pname}</a></div>
+                                    <div>${product.count}</div>
+                                    <div>${product.price}</div>`
+                                });
+                                const $body = document.querySelector('#productList .allProducts .body');
+                                $body.innerHTML = result.join('');
+                            }
+                          })
+                          .catch(err => console.log('err: ', err));
+        }
+
+        //필드 초기화
+        function clearForm() {
+            pid.value = '';
+            pname.value = '';
+            count.value = '';
+            price.value = '';
+        }
+    
+
+    </script>
+</body>
+</html>

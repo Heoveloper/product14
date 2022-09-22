@@ -28,31 +28,31 @@ public class ProductDAOImpl implements ProductDAO{
   public Long save(Product product) {
     StringBuffer sql = new StringBuffer();
 
-    sql.append("insert into product(product_id,pname,quantity,price) ");
-    sql.append("     values(product_product_id_seq.nextval, ?, ?, ?) ");
+    sql.append("insert into product(pid, pname, count, price) ");
+    sql.append("     values(product_pid_seq.nextval, ?, ?, ?) ");
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
     jt.update(new PreparedStatementCreator() {
       @Override
       public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-        PreparedStatement pstmt = con.prepareStatement(sql.toString(), new String[]{"product_id"});
+        PreparedStatement pstmt = con.prepareStatement(sql.toString(), new String[]{"pid"});
         pstmt.setString(1, product.getPname());
-        pstmt.setLong(2, product.getQuantity());
+        pstmt.setLong(2, product.getCount());
         pstmt.setLong(3, product.getPrice());
         return pstmt;
       }
     },keyHolder);
 
-    return Long.valueOf(keyHolder.getKeys().get("product_id").toString());
+    return Long.valueOf(keyHolder.getKeys().get("pid").toString());
   }
 
   //목록
   @Override
   public List<Product> findAll() {
     StringBuffer sql = new StringBuffer();
-    sql.append("select product_id,pname,quantity,price ");
+    sql.append("select pid, pname, count, price ");
     sql.append("  from product ");
-    sql.append("order by product_id desc ");
+    sql.append("order by pid desc ");
 
     List<Product> products = jt.query(sql.toString(), new BeanPropertyRowMapper<>(Product.class));
 
@@ -64,9 +64,9 @@ public class ProductDAOImpl implements ProductDAO{
   public Optional<Product> findByProductId(Long productId) {
     StringBuffer sql = new StringBuffer();
 
-    sql.append("select product_id, pname, quantity, price ");
+    sql.append("select pid, pname, count, price ");
     sql.append("  from product ");
-    sql.append(" where product_id = ? ");
+    sql.append(" where pid = ? ");
 
     try {
 
@@ -89,12 +89,12 @@ public class ProductDAOImpl implements ProductDAO{
     StringBuffer sql = new StringBuffer();
     sql.append("update product ");
     sql.append("   set pname = ?, ");
-    sql.append("       quantity = ?, ");
+    sql.append("       count = ?, ");
     sql.append("       price = ? ");
-    sql.append(" where product_id = ? ");
+    sql.append(" where pid = ? ");
 
     int affectedRow = jt.update(sql.toString(),
-        product.getPname(), product.getQuantity(), product.getPrice(),productId);
+        product.getPname(), product.getCount(), product.getPrice(),productId);
     return affectedRow;
   }
 
@@ -102,7 +102,7 @@ public class ProductDAOImpl implements ProductDAO{
   @Override
   public int deleteByProductId(Long productId) {
 
-    String sql = "delete from product where product_id = ? ";
+    String sql = "delete from product where pid = ? ";
 
     int affectedRow = jt.update(sql.toString(), productId);
 
