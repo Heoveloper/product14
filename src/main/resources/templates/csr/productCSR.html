@@ -83,11 +83,13 @@
 
     <script>
         const form = {
-        pid: document.getElementById('pid'),
-        pname: document.getElementById('pname'),
-        count: document.getElementById('count'),
-        price: document.getElementById('price')
+            pid: document.getElementById('pid'),
+            pname: document.getElementById('pname'),
+            count: document.getElementById('count'),
+            price: document.getElementById('price')
         }
+
+        allProducts();
 
         //클리어버튼 클릭해서 클리어
         clsBtn.addEventListener('click', e => {
@@ -107,6 +109,7 @@
         addBtn.addEventListener('click', e => {
             const product = getInputData();
             add(product);
+            clearForm();
         });
 
         //상품등록 함수
@@ -138,11 +141,7 @@
                         }).then(res => res.json())
                           .then(res => {
                             if(res.header.rtcd == '00') {
-                                const {pid, pname, count, price} = res.data;
-                                document.getElementById('pid').value = pid;
-                                document.getElementById('pname').value = pname;
-                                document.getElementById('count').value = count;
-                                document.getElementById('price').value = price;
+                                fillForm(res.data);
                             }
                           })
                           .catch(err => console.log('err: ', err));
@@ -151,6 +150,7 @@
         //수정버튼 클릭해서 상품 수정
         editBtn.addEventListener('click', e => {
             edit(pid.value, getInputData());
+            clearForm();
         });
 
         //상품수정 함수
@@ -171,6 +171,7 @@
             if(!confirm('삭제하시겠습니까?')) return;
             const id = pid.value;
             deleteById(id);
+            clearForm();
         });
 
         //상품삭제 함수
@@ -186,11 +187,11 @@
 
         //목록버튼 클릭해서 전체상품목록 보기
         listBtn.addEventListener('click', e => {
-            findAll();
+            allProducts();
         });
 
         //전체상품목록 함수
-        function findAll() {
+        function allProducts() {
             const url = `http://localhost:9080/api/products`;
 
             fetch (url, {method: 'GET',
@@ -210,6 +211,14 @@
                             }
                           })
                           .catch(err => console.log('err: ', err));
+        }
+
+
+        function fillForm ({pid, pname, count, price}) {
+            form.pid.value = pid;
+            form.pname.value = pname;
+            form.count.value = count;
+            form.price.value = price;
         }
 
         //필드 초기화

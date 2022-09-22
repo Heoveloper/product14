@@ -12,12 +12,12 @@ public interface ProductDAO {
   List<Product> findAll();
 
   //상품조회
-  Optional<Product> findByProductId(Long ProductId);
+  Optional<Product> findByProductId(Long pid);
 
   //상품변경
-  int update(Long ProductId,Product product);
+  int update(Long pid, Product product);
 
   //상품삭제
-  int deleteByProductId(Long productId);
+  int deleteByProductId(Long pid);
 
 }

@@ -23,20 +23,20 @@ public interface ProductSVC {
    * 상품조회
    * @return
    */
-  Optional<Product> findByProductId(Long productId);
+  Optional<Product> findByProductId(Long pid);
 
   /**
    * 상품변경
-   * @param productId 상품아이디
+   * @param pid 상품아이디
    * @param product 상품
    * @return
    */
-  int update(Long productId, Product product);
+  int update(Long pid, Product product);
 
   /**
    * 상품삭제
-   * @param productId
+   * @param pid
    * @return
    */
-  int deleteByProductId(Long productId);
+  int deleteByProductId(Long pid);
 }

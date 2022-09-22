@@ -47,7 +47,7 @@ public class ProductController {
 
     ApiResponse<Product> response = null;
     if (findedProduct.isPresent()) {
-      response = ApiResponse.createApiResMsg("00", "조회 성공", null);
+      response = ApiResponse.createApiResMsg("00", "조회 성공", findedProduct.get());
     } else {
       response = ApiResponse.createApiResMsg("99", "조회하려는 상품이 없습니다.", null);
     }
@@ -89,9 +89,9 @@ public class ProductController {
   @GetMapping("/products")
   public ApiResponse<List<Product>> allProducts() {
 
-    productSVC.findAll();
+    List<Product> all = productSVC.findAll();
 
-    return ApiResponse.createApiResMsg("00", "전체 상품목록 조회 성공", null);
+    return ApiResponse.createApiResMsg("00", "전체 상품목록 조회 성공", all);
   }
 
 }
