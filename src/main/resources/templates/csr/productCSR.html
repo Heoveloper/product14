@@ -68,6 +68,9 @@
 
     <div id="productList">
         <h3>전체상품 목록</h3>
+        <div>
+            <button id="listBtn">목록</button>
+        </div>
         <div class="allProducts">
             <div class="head">
                 <div>상품아이디</div><div>상품명</div><div>수량</div><div>단가</div>
@@ -75,13 +78,17 @@
             <div class="body">
             </div>
         </div>
-        <div>
-            <button id="listBtn">목록</button>
-        </div>
     </div>
 
 
     <script>
+        const form = {
+        pid: document.getElementById('pid'),
+        pname: document.getElementById('pname'),
+        count: document.getElementById('count'),
+        price: document.getElementById('price')
+        }
+
         //클리어버튼 클릭해서 클리어
         clsBtn.addEventListener('click', e => {
             clearForm();
@@ -179,20 +186,20 @@
 
         //목록버튼 클릭해서 전체상품목록 보기
         listBtn.addEventListener('click', e => {
-            allProducts();
+            findAll();
         });
 
         //전체상품목록 함수
-        function allProducts() {
+        function findAll() {
             const url = `http://localhost:9080/api/products`;
 
             fetch (url, {method: 'GET',
                          headers: {'Accept': 'application/json'}
-                        }).then(response => response.json())
-                          .then(response => {
-                                if(response.header.rtcd == '00') {
+                        }).then(res => res.json())
+                          .then(res => {
+                                if(res.header.rtcd == '00') {
                                 const result =
-                                response.data.map(product => {
+                                res.data.map(product => {
                                     return `<div>${product.pid}</div>
                                     <div><a href='#' onclick='findById(${product.pid})'>${product.pname}</a></div>
                                     <div>${product.count}</div>
